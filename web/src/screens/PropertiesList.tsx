@@ -84,7 +84,7 @@ export default function PropertiesList() {
         <button
           type="button"
           className="btn btn-primary"
-          style={{ height: 36, padding: '0 13px', fontSize: 12.5 }}
+          style={{ height: 36, padding: '0 13px', fontSize: 13.5 }}
           onClick={startNewProperty}
         >
           <Plus size={14} aria-hidden />
@@ -133,7 +133,7 @@ export default function PropertiesList() {
               <b
                 style={{
                   display: 'block',
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: 800,
                   letterSpacing: '-0.02em',
                   fontVariantNumeric: 'tabular-nums',
@@ -142,7 +142,7 @@ export default function PropertiesList() {
                 {item.value}
               </b>
               <span
-                style={{ display: 'block', marginTop: 5, fontSize: 9.5, fontWeight: 600, color: 'var(--ink-3)' }}
+                style={{ display: 'block', marginTop: 5, fontSize: 10.5, fontWeight: 600, color: 'var(--ink-3)' }}
               >
                 {item.label}
               </span>
@@ -177,7 +177,7 @@ export default function PropertiesList() {
             <button
               type="button"
               className="btn btn-soft"
-              style={{ height: 36, padding: '0 12px', fontSize: 12.5 }}
+              style={{ height: 36, padding: '0 12px', fontSize: 13.5 }}
               onClick={resumeDraft}
             >
               Continue
@@ -252,7 +252,7 @@ export default function PropertiesList() {
                       </span>
                     )}
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span className="row-title" style={{ display: 'block', fontSize: 14, fontWeight: 800 }}>
+                      <span className="row-title" style={{ display: 'block', fontSize: 15, fontWeight: 800 }}>
                         {property.details.name}
                       </span>
                       <span className="row-sub" style={{ display: 'block' }}>
@@ -366,7 +366,7 @@ export default function PropertiesList() {
             </div>
           }
         >
-          <p style={{ margin: '4px 0 0', fontSize: 13, fontWeight: 600, color: 'var(--ink-2)' }}>
+          <p style={{ margin: '4px 0 0', fontSize: 14, fontWeight: 600, color: 'var(--ink-2)' }}>
             {deleting.details.name} and every level, space and rent setting in it will be removed from
             this browser.
           </p>

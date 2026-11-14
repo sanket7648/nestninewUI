@@ -50,7 +50,7 @@ export default function StepReview() {
           {details.name.slice(0, 1).toUpperCase() || 'P'}
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="row-title" style={{ fontSize: 15.5, fontWeight: 800 }}>
+          <div className="row-title" style={{ fontSize: 16.5, fontWeight: 800 }}>
             {details.name || 'Untitled property'}
           </div>
           <div className="row-sub">

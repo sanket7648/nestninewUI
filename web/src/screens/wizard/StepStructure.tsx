@@ -127,20 +127,20 @@ export default function StepStructure({
     <>
       <div className="page" style={{ paddingTop: 16 }}>
         <div className="card" style={{ padding: 13, marginBottom: 14 }}>
-          <div className="h3" style={{ fontSize: 16 }}>
+          <div className="h3" style={{ fontSize: 17 }}>
             {draft.details.name || 'Property'}
           </div>
           <div className="row-sub" style={{ marginTop: 6 }}>
             {draft.details.type || 'Type not set'}
           </div>
           <div style={{ display: 'flex', gap: 20, marginTop: 12 }}>
-            <span className="num" style={{ fontSize: 12, fontWeight: 700 }}>
+            <span className="num" style={{ fontSize: 13, fontWeight: 700 }}>
               {draft.levels.length}
               <span className="muted" style={{ marginLeft: 4 }}>
                 levels
               </span>
             </span>
-            <span className="num" style={{ fontSize: 12, fontWeight: 700 }}>
+            <span className="num" style={{ fontSize: 13, fontWeight: 700 }}>
               {units}
               <span className="muted" style={{ marginLeft: 4 }}>
                 rental spaces
@@ -381,7 +381,7 @@ export default function StepStructure({
                 borderTop: '1px solid var(--hair)',
                 background: '#f8fcfa',
                 color: 'var(--teal)',
-                fontSize: 12.5,
+                fontSize: 13.5,
                 fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
@@ -753,7 +753,7 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
             }}
           >
             <Copy size={15} color="var(--teal)" aria-hidden />
-            <span style={{ flex: 1, fontSize: 11, fontWeight: 600, color: '#3c5966' }}>
+            <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: '#3c5966' }}>
               From{' '}
               <b style={{ fontWeight: 800, color: 'var(--ink)' }}>{level.copiedFromName}</b>{' '}
               configuration
@@ -761,7 +761,7 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
             <button
               type="button"
               className="btn-text"
-              style={{ fontSize: 11 }}
+              style={{ fontSize: 12 }}
               onClick={() => updateLevel(level.id, { copiedFromName: undefined })}
             >
               Clear
@@ -1416,6 +1416,7 @@ export function GenerateSpacesSheet({
   onClose: () => void;
   onGenerate: (config: GenerateConfig) => void;
 }) {
+  const { draft } = useApp();
   const initialKind = guessKind(level);
   const [kind, setKind] = useState<SpaceKind>(initialKind);
   const [count, setCount] = useState('20');
@@ -1425,6 +1426,8 @@ export function GenerateSpacesSheet({
   const [featureCounts, setFeatureCounts] = useState<Record<string, number>>({});
   const [prefix, setPrefix] = useState(defaultPrefix[initialKind]);
   const [start, setStart] = useState(String(defaultStart[initialKind]));
+
+  if (!draft) return null;
 
   const parsedCount = Math.max(1, Math.min(500, Number(count) || 1));
   const parsedBeds =

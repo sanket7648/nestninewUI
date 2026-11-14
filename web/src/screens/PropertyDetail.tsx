@@ -92,7 +92,7 @@ export default function PropertyDetail({ propertyId }: { propertyId: string }) {
       )}
 
       <div className="page page-wide" style={{ paddingTop: 12 }}>
-        <div className="h3" style={{ fontSize: 20 }}>
+        <div className="h3" style={{ fontSize: 21 }}>
           {property.details.name}
         </div>
         <div className="row-sub" style={{ marginTop: 6 }}>
@@ -104,7 +104,7 @@ export default function PropertyDetail({ propertyId }: { propertyId: string }) {
             display: 'flex',
             gap: 6,
             alignItems: 'flex-start',
-            fontSize: 11.5,
+            fontSize: 12.5,
             fontWeight: 600,
             color: 'var(--ink-2)',
           }}

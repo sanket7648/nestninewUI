@@ -56,8 +56,8 @@ export function Sidebar() {
       <div className="nav-user">
         <img src="https://i.pravatar.cc/56?u=rajesh.kulkarni" alt="" />
         <div>
-          <b style={{ display: 'block', fontSize: 11.5, fontWeight: 700 }}>Rajesh Kulkarni</b>
-          <span style={{ display: 'block', fontSize: 10, fontWeight: 600, color: 'var(--ink-3)' }}>
+          <b style={{ display: 'block', fontSize: 12.5, fontWeight: 700 }}>Rajesh Kulkarni</b>
+          <span style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--ink-3)' }}>
             Owner account
           </span>
         </div>

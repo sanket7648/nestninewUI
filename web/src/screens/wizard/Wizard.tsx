@@ -219,7 +219,7 @@ function CreatedScreen({ propertyId }: { propertyId: string }) {
           <Check size={34} aria-hidden />
         </span>
         <div className="h1">Property created</div>
-        <div style={{ marginTop: 10, fontSize: 14, fontWeight: 700, color: 'var(--teal-dark)' }}>
+        <div style={{ marginTop: 10, fontSize: 15, fontWeight: 700, color: 'var(--teal-dark)' }}>
           {property.details.name}
         </div>
         <div
@@ -239,14 +239,14 @@ function CreatedScreen({ propertyId }: { propertyId: string }) {
             { value: priced, label: 'priced' },
           ].map((item) => (
             <div key={item.label}>
-              <b style={{ fontSize: 17, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+              <b style={{ fontSize: 18, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
                 {item.value}
               </b>
               <span
                 style={{
                   display: 'block',
                   marginTop: 6,
-                  fontSize: 10,
+                  fontSize: 11,
                   fontWeight: 600,
                   color: 'var(--ink-3)',
                 }}

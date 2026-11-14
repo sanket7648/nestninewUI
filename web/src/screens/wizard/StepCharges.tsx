@@ -141,7 +141,7 @@ export default function StepCharges() {
                 borderTop: '1px solid var(--hair)',
                 background: '#f8fcfa',
                 color: 'var(--teal)',
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
@@ -278,7 +278,7 @@ function ChargeEditorSheet({
                 <Icon size={17} color={active ? 'var(--teal-dark)' : '#5e7b86'} />
                 <span
                   style={{
-                    fontSize: 11.5,
+                    fontSize: 12.5,
                     fontWeight: active ? 700 : 600,
                     color: active ? 'var(--teal-dark)' : 'var(--ink-2)',
                     lineHeight: 1.25,

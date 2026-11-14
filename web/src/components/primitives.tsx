@@ -370,7 +370,7 @@ export function EmptyState({
   return (
     <div className="empty">
       <span className="empty-icon">{icon}</span>
-      <div className="h3" style={{ fontSize: 14 }}>
+      <div className="h3" style={{ fontSize: 15 }}>
         {title}
       </div>
       <p>{description}</p>

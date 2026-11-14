@@ -49,10 +49,10 @@ export default function StepRentals() {
             marginBottom: 9,
           }}
         >
-          <div className="h2" style={{ fontSize: 17 }}>
+          <div className="h2" style={{ fontSize: 18 }}>
             Set rent by space
           </div>
-          <span className="num" style={{ fontSize: 11.5, fontWeight: 700, color: 'var(--teal)' }}>
+          <span className="num" style={{ fontSize: 12.5, fontWeight: 700, color: 'var(--teal)' }}>
             {priced} / {units} priced
           </span>
         </div>
