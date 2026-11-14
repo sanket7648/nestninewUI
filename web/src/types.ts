@@ -140,6 +140,7 @@ export interface Level {
   usage: string;
   usageTag: UsageTag;
   sharedFacilities: string[];
+  sharedFacilityCounts?: Record<string, number>;
   spaces: Space[];
   commonArea: boolean;
   /** Set when spaces were copied from another floor, used for provenance. */

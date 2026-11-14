@@ -363,8 +363,7 @@ function FloorSheet({
         <div className="chips" style={{ marginBottom: 12 }}>
           {levelFacilities.map((facility) => (
             <span className="pill" key={facility.id}>
-              {facility.name}
-              {facility.scope === 'property' && ` · ${facility.quantity}`}
+              {facility.name} · {facility.quantity}
             </span>
           ))}
         </div>

@@ -95,7 +95,7 @@ export default function StepStructure({
   onOpenRange: (levelIds: string[]) => void;
   onOpenFacilities: () => void;
 }) {
-  const { draft, addLevels, updateLevel, removeLevel, notify, loadExampleDraft } = useApp();
+  const { draft, addLevels, updateLevel, removeLevel, notify } = useApp();
   const [addOpen, setAddOpen] = useState(false);
   const [renamingLevelId, setRenamingLevelId] = useState<string | null>(null);
   const [levelName, setLevelName] = useState('');
@@ -209,13 +209,15 @@ export default function StepStructure({
                   Select
                 </button>
               )}
-              <button
-                type="button"
-                className="btn-text"
-                onClick={() => setAddOpen(true)}
-              >
-                Add level
-              </button>
+              {draft.levels.length > 0 && (
+                <button
+                  type="button"
+                  className="btn-text"
+                  onClick={() => setAddOpen(true)}
+                >
+                  Add level
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -240,22 +242,10 @@ export default function StepStructure({
             title="No levels yet"
             description="Add a basement, floor, terrace or any other area. Each floor stays separate and can be edited on its own."
             action={
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-                <button type="button" className="btn btn-primary" onClick={() => setAddOpen(true)}>
-                  <Plus size={15} aria-hidden />
-                  Add level
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => {
-                    loadExampleDraft();
-                    notify('Example building loaded');
-                  }}
-                >
-                  Load example
-                </button>
-              </div>
+              <button type="button" className="btn btn-primary" onClick={() => setAddOpen(true)}>
+                <Plus size={15} aria-hidden />
+                Add level
+              </button>
             }
           />
         ) : (
@@ -657,6 +647,7 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
   const {
     draft,
     updateLevel,
+    updateFacility,
     updateSpace,
     removeSpace,
     generateSpaces,
@@ -687,6 +678,38 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
   const priced = level.spaces.filter((space) => space.rent).length;
   const space = level.spaces.find((item) => item.id === spaceId) ?? null;
   const levelFacilities = facilitiesForLevel(level, draft.facilities);
+  const updateFloorFacilityCount = (name: string, quantity: number) =>
+    updateLevel(level.id, {
+      sharedFacilityCounts: {
+        ...level.sharedFacilityCounts,
+        [name]: Math.max(1, Math.floor(quantity)),
+      },
+    });
+  const removeFloorFacility = (name: string) => {
+    if (!window.confirm(`Remove ${name} from ${level.name}?`)) return;
+    const sharedFacilityCounts = { ...level.sharedFacilityCounts };
+    delete sharedFacilityCounts[name];
+    updateLevel(level.id, {
+      sharedFacilities: level.sharedFacilities.filter((facility) => facility !== name),
+      sharedFacilityCounts,
+    });
+    notify(`${name} removed from ${level.name}`);
+  };
+  const updateCommonFacilityCount = (id: string, quantity: number) =>
+    updateFacility(id, { quantity: Math.max(1, Math.floor(quantity)) });
+  const removeCommonFacilityFromLevel = (id: string, name: string) => {
+    if (!window.confirm(`Remove ${name} from ${level.name}?`)) return;
+    const facility = draft.facilities.find((item) => item.id === id);
+    if (!facility) return;
+    updateFacility(id, {
+      scope: 'levels',
+      levelIds:
+        facility.scope === 'property'
+          ? draft.levels.filter((item) => item.id !== level.id).map((item) => item.id)
+          : facility.levelIds.filter((id) => id !== level.id),
+    });
+    notify(`${name} removed from ${level.name}`);
+  };
   const toggleSpaceSelection = (spaceId: string) =>
     setSelectedSpaceIds((current) =>
       current.includes(spaceId)
@@ -935,16 +958,67 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
         {tab === 'facilities' && (
           <div style={{ marginTop: 14 }}>
             <p className="muted" style={{ margin: '0 0 10px' }}>
-              Facilities assigned to this floor appear here. Add floor-only items below; common
-              facilities and their floor assignments are managed separately.
+              Floor-only facilities can be added here. Common facilities assigned to this floor
+              also appear here, with their count shared across assigned floors.
             </p>
             {levelFacilities.length ? (
-              <div className="chips" style={{ marginBottom: 12 }}>
+              <div className="list" style={{ marginBottom: 12 }}>
                 {levelFacilities.map((facility) => (
-                  <span className="pill" key={facility.id}>
-                    {facility.name}
-                    {facility.scope === 'property' && ` · ${facility.quantity}`}
-                  </span>
+                  <div className="row" key={facility.id}>
+                    <span className="row-main">
+                      <span className="row-title" style={{ display: 'block' }}>
+                        {facility.name}
+                      </span>
+                      <span className="row-sub" style={{ display: 'block' }}>
+                        {facility.scope === 'common'
+                          ? 'Common facility · shared count'
+                          : 'Floor only'}
+                      </span>
+                    </span>
+                    <div
+                      className="facility-quantity"
+                      role="group"
+                      aria-label={`${facility.name} quantity`}
+                    >
+                      <button
+                        type="button"
+                        aria-label={`Decrease ${facility.name} quantity`}
+                        disabled={facility.quantity <= 1}
+                        onClick={() =>
+                          facility.scope === 'common'
+                            ? updateCommonFacilityCount(facility.id, facility.quantity - 1)
+                            : updateFloorFacilityCount(facility.name, facility.quantity - 1)
+                        }
+                      >
+                        <Minus size={13} aria-hidden />
+                      </button>
+                      <span>{facility.quantity}</span>
+                      <button
+                        type="button"
+                        aria-label={`Increase ${facility.name} quantity`}
+                        onClick={() =>
+                          facility.scope === 'common'
+                            ? updateCommonFacilityCount(facility.id, facility.quantity + 1)
+                            : updateFloorFacilityCount(facility.name, facility.quantity + 1)
+                        }
+                      >
+                        <Plus size={13} aria-hidden />
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      className="icon-action is-danger"
+                      aria-label={`Remove ${facility.name} from ${level.name}`}
+                      title="Remove facility from floor"
+                      onClick={() =>
+                        facility.scope === 'common'
+                          ? removeCommonFacilityFromLevel(facility.id, facility.name)
+                          : removeFloorFacility(facility.name)
+                      }
+                    >
+                      <Trash2 size={15} aria-hidden />
+                    </button>
+                  </div>
                 ))}
               </div>
             ) : (
@@ -992,7 +1066,15 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
               type="button"
               className="btn btn-primary btn-block"
               onClick={() => {
-                updateLevel(level.id, { sharedFacilities: facilitySelection });
+                updateLevel(level.id, {
+                  sharedFacilities: facilitySelection,
+                  sharedFacilityCounts: Object.fromEntries(
+                    facilitySelection.map((name) => [
+                      name,
+                      Math.max(1, Math.floor(level.sharedFacilityCounts?.[name] ?? 1)),
+                    ]),
+                  ),
+                });
                 setFacilityAddOpen(false);
                 notify(`${plural(facilitySelection.length, 'facility')} saved for ${level.name}`);
               }}

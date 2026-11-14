@@ -63,8 +63,46 @@ describe('facilitiesForLevel', () => {
       id: 'wifi',
       name: 'Wi-Fi',
       quantity: 2,
-      scope: 'property',
+      scope: 'common',
     });
     expect(facilitiesForLevel(levels[2], facilities)).toEqual([]);
+  });
+
+  it('includes a whole-property facility on every floor', () => {
+    const wholePropertyFacility: Facility = {
+      id: 'security',
+      name: 'Security',
+      quantity: 1,
+      scope: 'property',
+      levelIds: [],
+    };
+
+    expect(facilitiesForLevel(levels[0], [wholePropertyFacility])).toContainEqual({
+      id: 'security',
+      name: 'Security',
+      quantity: 1,
+      scope: 'common',
+    });
+    expect(facilitiesForLevel(levels[2], [wholePropertyFacility])).toContainEqual({
+      id: 'security',
+      name: 'Security',
+      quantity: 1,
+      scope: 'common',
+    });
+  });
+
+  it('uses the saved quantity for a floor-only facility', () => {
+    const level = {
+      ...levels[1],
+      sharedFacilities: ['Laundry'],
+      sharedFacilityCounts: { Laundry: 3 },
+    };
+
+    expect(facilitiesForLevel(level, [])).toContainEqual({
+      id: 'floor:ground:Laundry',
+      name: 'Laundry',
+      quantity: 3,
+      scope: 'floor',
+    });
   });
 });

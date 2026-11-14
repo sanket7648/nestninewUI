@@ -29,15 +29,15 @@ export function floorColorStyle(levels: Level[], levelId: string) {
 
 export function facilitiesForLevel(level: Level, facilities: Facility[]) {
   const scopedFacilities = facilities.filter(
-    (facility) => facility.scope === 'levels' && facility.levelIds.includes(level.id),
+    (facility) =>
+      facility.scope === 'property' ||
+      (facility.scope === 'levels' && facility.levelIds.includes(level.id)),
   );
-  const scopedNames = new Set(scopedFacilities.map((facility) => facility.name.toLowerCase()));
   const floorFacilities = [...new Set(level.sharedFacilities)]
-    .filter((name) => !scopedNames.has(name.toLowerCase()))
     .map((name) => ({
       id: `floor:${level.id}:${name}`,
       name,
-      quantity: 1,
+      quantity: Math.max(1, Math.floor(level.sharedFacilityCounts?.[name] ?? 1)),
       scope: 'floor' as const,
     }));
 
@@ -46,7 +46,7 @@ export function facilitiesForLevel(level: Level, facilities: Facility[]) {
       id: facility.id,
       name: facility.name,
       quantity: facility.quantity ?? 1,
-      scope: 'property' as const,
+      scope: 'common' as const,
     })),
     ...floorFacilities,
   ];

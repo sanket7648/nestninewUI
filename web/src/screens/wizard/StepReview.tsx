@@ -381,8 +381,7 @@ function SpaceReviewSheet({
         <div className="chips">
           {levelFacilities.map((facility) => (
             <span className="pill" key={facility.id}>
-              {facility.name}
-              {facility.scope === 'property' && ` · ${facility.quantity}`}
+              {facility.name} · {facility.quantity}
             </span>
           ))}
         </div>

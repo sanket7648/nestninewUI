@@ -271,6 +271,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
               usage: source.usage,
               usageTag: source.usageTag,
               sharedFacilities: [...source.sharedFacilities],
+              sharedFacilityCounts: source.sharedFacilityCounts
+                ? { ...source.sharedFacilityCounts }
+                : undefined,
               copiedFromName: source.name,
               spaces: source.spaces.map((s) => ({
                 ...s,
