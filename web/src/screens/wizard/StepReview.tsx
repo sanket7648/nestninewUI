@@ -5,6 +5,7 @@ import {
   chargeSummary,
   facilitiesForLevel,
   floorColorStyle,
+  levelSummary,
   totalPriced,
   totalUnits,
 } from '../../lib/model';
@@ -50,7 +51,7 @@ export default function StepReview() {
           {details.name.slice(0, 1).toUpperCase() || 'P'}
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="row-title" style={{ fontSize: 16.5, fontWeight: 800 }}>
+          <div className="row-title" style={{ fontSize: 19.8, fontWeight: 800 }}>
             {details.name || 'Untitled property'}
           </div>
           <div className="row-sub">
@@ -114,7 +115,7 @@ export default function StepReview() {
                       {level.name}
                     </span>
                     <span className="row-sub" style={{ display: 'block' }}>
-                      {level.usage}
+                      {levelSummary(level)}
                     </span>
                   </span>
                   <span className="row-right">
@@ -329,13 +330,13 @@ function SpaceReviewSheet({
           </span>
           <span>
             <strong>{level.name}</strong>
-            <small>{level.usage}</small>
+            <small>{levelSummary(level)}</small>
           </span>
         </div>
         <PreviewRow label="Property" value={propertyName || 'Untitled property'} />
         <PreviewRow label="Property type" value={propertyType} />
         <PreviewRow label="Address" value={propertyAddress || 'Not set'} />
-        <PreviewRow label="Level" value={`${level.name} · ${level.usage}`} />
+        <PreviewRow label="Level" value={`${level.name} · ${levelSummary(level)}`} />
         <PreviewRow label="Space" value={`${space.name} · ${space.kind}`} />
         <PreviewRow
           label="Rentable units"

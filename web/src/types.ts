@@ -88,6 +88,7 @@ export const SPACE_KINDS: SpaceKind[] = [
 
 export type UsageTag =
   | 'pg'
+  | 'general'
   | 'residential'
   | 'commercial'
   | 'parking'

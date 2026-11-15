@@ -21,6 +21,7 @@ import { uid } from '../lib/format';
 import { loadStore, saveStore, type Persisted } from '../lib/storage';
 import { exampleDraft, seedProperties } from '../lib/sample';
 import { buildSpacesForLevel, type GenerateConfig } from '../lib/generate';
+import { copiedSpaceName } from '../lib/model';
 
 export type View =
   | { name: 'list' }
@@ -275,9 +276,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 ? { ...source.sharedFacilityCounts }
                 : undefined,
               copiedFromName: source.name,
-              spaces: source.spaces.map((s) => ({
+              spaces: source.spaces.map((s, index) => ({
                 ...s,
                 id: uid('sp'),
+                name: copiedSpaceName(s, l, index),
                 features: [...s.features],
                 featureCounts: s.featureCounts ? { ...s.featureCounts } : undefined,
                 rent: s.rent ? { ...s.rent } : null,

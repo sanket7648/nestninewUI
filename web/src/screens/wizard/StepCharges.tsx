@@ -18,7 +18,7 @@ import {
 import { useApp } from '../../state/AppContext';
 import { EmptyState, Field, PreviewRow, SelectField, TextField } from '../../components/primitives';
 import { Sheet } from '../../components/Sheet';
-import { chargeSummary, chargeMethodLabel, floorColorStyle } from '../../lib/model';
+import { chargeSummary, chargeMethodLabel, floorColorStyle, levelSummary } from '../../lib/model';
 import { inr, uid } from '../../lib/format';
 import type { Charge, ChargeMethod } from '../../types';
 
@@ -141,7 +141,7 @@ export default function StepCharges() {
                 borderTop: '1px solid var(--hair)',
                 background: '#f8fcfa',
                 color: 'var(--teal)',
-                fontSize: 14,
+                fontSize: 16.8,
                 fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
@@ -278,7 +278,7 @@ function ChargeEditorSheet({
                 <Icon size={17} color={active ? 'var(--teal-dark)' : '#5e7b86'} />
                 <span
                   style={{
-                    fontSize: 12.5,
+                    fontSize: 15,
                     fontWeight: active ? 700 : 600,
                     color: active ? 'var(--teal-dark)' : 'var(--ink-2)',
                     lineHeight: 1.25,
@@ -404,7 +404,7 @@ function ChargeEditorSheet({
                     {level.name}
                   </span>
                   <span className="row-sub" style={{ display: 'block' }}>
-                    {level.usage}
+                    {levelSummary(level)}
                   </span>
                 </span>
               </div>

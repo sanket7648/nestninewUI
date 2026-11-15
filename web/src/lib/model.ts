@@ -54,31 +54,24 @@ export function facilitiesForLevel(level: Level, facilities: Facility[]) {
 
 export const pricedUnits = levelPricedUnits;
 
-export function levelSummary(level: Level): string {
-  const n = level.spaces.length;
-  if (n === 0) return level.commonArea ? 'Common area' : 'No spaces yet';
-  const units = levelUnits(level);
-  const beds = level.spaces.reduce((total, space) => total + (space.beds ?? 0), 0);
-  switch (level.spaces[0].kind) {
-    case 'Room':
-      return beds > 0
-        ? `${plural(n, 'room')}, ${plural(beds, 'bed')}`
-        : plural(n, 'room');
-    case 'Shop':
-      return plural(units, 'shop');
-    case 'Studio apartment':
-      return plural(units, 'studio');
-    case 'Parking slot':
-      return plural(units, 'slot');
-    case 'Workstation':
-      return plural(units, 'seat');
-    case 'Storage unit':
-      return plural(units, 'unit');
-    case 'Plot':
-      return plural(units, 'plot');
-    default:
-      return plural(n, level.spaces[0].kind.toLowerCase());
+function summarizeSpaces(spaces: Space[]): string {
+  const counts = new Map<string, number>();
+  for (const space of spaces) {
+    counts.set(space.kind, (counts.get(space.kind) ?? 0) + 1);
   }
+
+  const summary = [...counts].map(([kind, count]) => plural(count, kind.toLowerCase()));
+  const beds = spaces
+    .filter((space) => space.kind === 'Room')
+    .reduce((total, space) => total + (space.beds ?? 0), 0);
+  if (beds > 0) summary.push(plural(beds, 'bed'));
+
+  return summary.join(' · ');
+}
+
+export function levelSummary(level: Level): string {
+  if (level.spaces.length === 0) return level.commonArea ? 'Common area' : 'No spaces yet';
+  return summarizeSpaces(level.spaces);
 }
 
 export interface LevelGroup {
@@ -162,32 +155,7 @@ export function groupSummary(group: LevelGroup): string {
   const first = group.levels[0];
   if (!first) return 'No spaces yet';
   if (!first.spaces.length) return first.commonArea ? 'Common area' : 'No spaces yet';
-  const rooms = group.levels.reduce((n, l) => n + l.spaces.length, 0);
-  const units = groupUnits(group);
-  const beds = group.levels.reduce(
-    (total, level) => total + level.spaces.reduce((sum, space) => sum + (space.beds ?? 0), 0),
-    0,
-  );
-  switch (first.spaces[0].kind) {
-    case 'Room':
-      return beds > 0
-        ? `${plural(rooms, 'room')}, ${plural(beds, 'bed')}`
-        : plural(rooms, 'room');
-    case 'Shop':
-      return plural(units, 'shop');
-    case 'Studio apartment':
-      return plural(units, 'studio');
-    case 'Parking slot':
-      return plural(units, 'slot');
-    case 'Workstation':
-      return plural(units, 'seat');
-    case 'Storage unit':
-      return plural(units, 'unit');
-    case 'Plot':
-      return plural(units, 'plot');
-    default:
-      return plural(rooms, first.spaces[0].kind.toLowerCase());
-  }
+  return summarizeSpaces(group.levels.flatMap((level) => level.spaces));
 }
 
 export function priceBand(group: LevelGroup): PriceBand | null {
@@ -245,6 +213,11 @@ export function numberingFor(level: Level, prefix: string, start: number, count:
     const label = floorBase ? String(n) : String(n).padStart(2, '0');
     return prefix ? `${prefix} ${label}` : label;
   });
+}
+
+export function copiedSpaceName(space: Space, level: Level, index: number): string {
+  const prefix = space.name.match(/^(.*?)(\d+)$/)?.[1] ?? `${space.name} `;
+  return numberingFor(level, prefix.trimEnd(), 1, index + 1)[index];
 }
 
 export { inr, plural };

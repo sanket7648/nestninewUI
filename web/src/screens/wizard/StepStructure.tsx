@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Building2,
   Check,
@@ -30,12 +30,10 @@ import {
   FLOOR_FACILITY_CATALOGUE,
   SPACE_FEATURE_CATALOGUE,
   SPACE_KINDS,
-  USAGES,
   type Facility,
   type Level,
   type Space,
   type SpaceKind,
-  type UsageTag,
 } from '../../types';
 import { facilitiesForLevel, floorColorStyle, levelSummary, totalUnits } from '../../lib/model';
 import { inr, plural } from '../../lib/format';
@@ -47,11 +45,10 @@ import {
   type GenerateConfig,
 } from '../../lib/generate';
 
-const tagFor = (usage: string): UsageTag =>
-  USAGES.find((item) => item.label === usage)?.tag ?? 'residential';
-
 const guessKind = (level: Level): SpaceKind => {
+  if (level.spaces.length > 0) return level.spaces[0].kind;
   switch (level.usageTag) {
+    case 'general':
     case 'pg':
       return 'Room';
     case 'parking':
@@ -93,7 +90,7 @@ export default function StepStructure({
 }: {
   onOpenFloor: (levelId: string) => void;
   onOpenRange: (levelIds: string[]) => void;
-  onOpenFacilities: () => void;
+  onOpenFacilities: (openAdd?: boolean) => void;
 }) {
   const { draft, addLevels, updateLevel, removeLevel, notify } = useApp();
   const [addOpen, setAddOpen] = useState(false);
@@ -127,20 +124,20 @@ export default function StepStructure({
     <>
       <div className="page" style={{ paddingTop: 16 }}>
         <div className="card" style={{ padding: 13, marginBottom: 14 }}>
-          <div className="h3" style={{ fontSize: 17 }}>
+          <div className="h3" style={{ fontSize: 20.4 }}>
             {draft.details.name || 'Property'}
           </div>
           <div className="row-sub" style={{ marginTop: 6 }}>
             {draft.details.type || 'Type not set'}
           </div>
           <div style={{ display: 'flex', gap: 20, marginTop: 12 }}>
-            <span className="num" style={{ fontSize: 13, fontWeight: 700 }}>
+            <span className="num" style={{ fontSize: 15.6, fontWeight: 700 }}>
               {draft.levels.length}
               <span className="muted" style={{ marginLeft: 4 }}>
                 levels
               </span>
             </span>
-            <span className="num" style={{ fontSize: 13, fontWeight: 700 }}>
+            <span className="num" style={{ fontSize: 15.6, fontWeight: 700 }}>
               {units}
               <span className="muted" style={{ marginLeft: 4 }}>
                 rental spaces
@@ -149,27 +146,36 @@ export default function StepStructure({
           </div>
         </div>
 
-        <button
-          type="button"
-          className="row"
-          style={{ padding: '11px 0' }}
-          onClick={onOpenFacilities}
-        >
-          <span className="row-badge" style={{ color: 'var(--teal)' }}>
-            <Building2 size={17} aria-hidden />
-          </span>
-          <span className="row-main">
-            <span className="row-title" style={{ display: 'block' }}>
-              Common facilities
+        <div className="row facilities-summary">
+          <button
+            type="button"
+            className="facility-summary-button"
+            onClick={() => onOpenFacilities()}
+          >
+            <span className="row-badge" style={{ color: 'var(--teal)' }}>
+              <Building2 size={17} aria-hidden />
             </span>
-            <span className="row-sub" style={{ display: 'block' }}>
-              {draft.facilities.length
-                ? `${draft.facilities.length} configured for the property`
-                : 'Lift, security, water supply'}
+            <span className="row-main">
+              <span className="row-title" style={{ display: 'block' }}>
+                Common facilities
+              </span>
+              <span className="row-sub" style={{ display: 'block' }}>
+                {draft.facilities.length
+                  ? `${draft.facilities.length} configured for the property`
+                  : 'Lift, security, water supply'}
+              </span>
             </span>
-          </span>
-          <ChevronRight size={15} className="row-chevron" aria-hidden />
-        </button>
+            <ChevronRight size={15} className="row-chevron" aria-hidden />
+          </button>
+          <button
+            type="button"
+            className="btn-text facilities-add"
+            onClick={() => onOpenFacilities(true)}
+          >
+            <Plus size={14} aria-hidden />
+            Add facility
+          </button>
+        </div>
 
         <div className="sec-head" style={{ marginTop: 14 }}>
           <span>Structure</span>
@@ -334,7 +340,7 @@ export default function StepStructure({
                           {level.name}
                         </span>
                         <span className="row-sub" style={{ display: 'block' }}>
-                          {level.usage} · {levelSummary(level)}
+                          {levelSummary(level)}
                         </span>
                       </span>
                       <ChevronRight size={15} className="row-chevron" aria-hidden />
@@ -381,7 +387,7 @@ export default function StepStructure({
                 borderTop: '1px solid var(--hair)',
                 background: '#f8fcfa',
                 color: 'var(--teal)',
-                fontSize: 13.5,
+                fontSize: 16.2,
                 fontWeight: 700,
                 display: 'flex',
                 alignItems: 'center',
@@ -415,7 +421,7 @@ function AddLevelSheet({
   const { draft } = useApp();
   const [kind, setKind] = useState<LevelKind>('upper');
   const [count, setCount] = useState('5');
-  const [usage, setUsage] = useState('PG / Hostel');
+  const usage = 'General';
   const [name, setName] = useState('');
 
   if (!draft) return null;
@@ -436,7 +442,7 @@ function AddLevelSheet({
         kind,
         count: Number(count) || 1,
         usage,
-        usageTag: tagFor(usage),
+        usageTag: 'general',
         name,
         nextFloor,
       }),
@@ -462,9 +468,6 @@ function AddLevelSheet({
             const found = options.find((option) => option.label === label);
             if (!found) return;
             setKind(found.value);
-            if (found.value === 'basement') setUsage('Parking');
-            if (found.value === 'ground') setUsage('Shopping');
-            if (found.value === 'terrace' || found.value === 'outdoor') setUsage('Common area');
           }}
         />
       </Field>
@@ -476,15 +479,6 @@ function AddLevelSheet({
           inputMode="numeric"
           hint={kind === 'upper' ? `Starts at Floor ${nextFloor}` : undefined}
           onChange={(value) => setCount(value.replace(/\D/g, ''))}
-        />
-      )}
-
-      {kind !== 'terrace' && (
-        <SelectField
-          label="Usage type"
-          value={usage}
-          options={USAGES.map((item) => ({ value: item.label, label: item.label }))}
-          onChange={setUsage}
         />
       )}
 
@@ -570,7 +564,7 @@ export function RangeScreen({
                       {level.name}
                     </span>
                     <span className="row-sub" style={{ display: 'block' }}>
-                      {level.usage} · {levelSummary(level)}
+                      {levelSummary(level)}
                     </span>
                   </span>
                 </button>
@@ -613,7 +607,7 @@ export function RangeScreen({
                       {level.name}
                     </span>
                     <span className="row-sub" style={{ display: 'block' }}>
-                      {level.usage} · {levelSummary(level)}
+                      {levelSummary(level)}
                     </span>
                   </span>
                 </button>
@@ -736,7 +730,7 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
           </span>
           <span>
             <strong>{level.name}</strong>
-            <small>{level.usage}</small>
+            <small>{levelSummary(level)}</small>
           </span>
         </div>
         {level.copiedFromName && (
@@ -753,7 +747,7 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
             }}
           >
             <Copy size={15} color="var(--teal)" aria-hidden />
-            <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: '#3c5966' }}>
+            <span style={{ flex: 1, fontSize: 14.4, fontWeight: 600, color: '#3c5966' }}>
               From{' '}
               <b style={{ fontWeight: 800, color: 'var(--ink)' }}>{level.copiedFromName}</b>{' '}
               configuration
@@ -761,7 +755,7 @@ export function FloorEditorScreen({ levelId }: { levelId: string }) {
             <button
               type="button"
               className="btn-text"
-              style={{ fontSize: 12 }}
+              style={{ fontSize: 14.4 }}
               onClick={() => updateLevel(level.id, { copiedFromName: undefined })}
             >
               Clear
@@ -1473,7 +1467,7 @@ export function GenerateSpacesSheet({
             {level.name}
           </span>
           <span className="row-sub" style={{ display: 'block' }}>
-            {level.usage}
+            {levelSummary(level)}
           </span>
         </span>
       </div>
@@ -1560,11 +1554,15 @@ export function GenerateSpacesSheet({
 
 /* ----------------------------- facilities --------------------------- */
 
-export function FacilitiesScreen() {
+export function FacilitiesScreen({ openAdd = false }: { openAdd?: boolean }) {
   const { draft, addFacility, updateFacility, removeFacility, notify } = useApp();
   const [addOpen, setAddOpen] = useState(false);
   const [scopeId, setScopeId] = useState<string | null>(null);
   const [customName, setCustomName] = useState('');
+
+  useEffect(() => {
+    if (openAdd) setAddOpen(true);
+  }, [openAdd]);
 
   if (!draft) return null;
 
@@ -1588,12 +1586,6 @@ export function FacilitiesScreen() {
             icon={<Building2 size={22} aria-hidden />}
             title="No common facilities"
             description="Lift, service lift, CCTV, security, generator, water supply and Wi-Fi are configured once here."
-            action={
-              <button type="button" className="btn btn-primary" onClick={() => setAddOpen(true)}>
-                <Plus size={15} aria-hidden />
-                Add facility
-              </button>
-            }
           />
         ) : (
           <>
@@ -1653,15 +1645,6 @@ export function FacilitiesScreen() {
                 );
               })}
             </div>
-            <button
-              type="button"
-              className="btn btn-ghost btn-block"
-              style={{ marginTop: 12 }}
-              onClick={() => setAddOpen(true)}
-            >
-              <Plus size={15} aria-hidden />
-              Add facility
-            </button>
           </>
         )}
         <div style={{ height: 24 }} />
@@ -1808,7 +1791,7 @@ export function FacilitiesScreen() {
                         {level.name}
                       </span>
                       <span className="row-sub" style={{ display: 'block' }}>
-                        {level.usage}
+                        {levelSummary(level)}
                       </span>
                     </span>
                   </button>

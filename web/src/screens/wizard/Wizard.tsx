@@ -16,7 +16,7 @@ import { totalPriced, totalUnits } from '../../lib/model';
 type Sub =
   | { kind: 'floor'; levelId: string; title: string }
   | { kind: 'range'; levelIds: string[]; title: string }
-  | { kind: 'facilities' };
+  | { kind: 'facilities'; openAdd?: boolean };
 
 export default function Wizard() {
   const { draft, setStep, openList, openProperty, notify, createProperty } = useApp();
@@ -134,7 +134,7 @@ export default function Wizard() {
           />
         )}
 
-        {sub?.kind === 'facilities' && <FacilitiesScreen />}
+        {sub?.kind === 'facilities' && <FacilitiesScreen openAdd={sub.openAdd} />}
 
         {!sub && step === 1 && <StepDetails showErrors={showErrors} />}
         {!sub && step === 2 && (
@@ -143,7 +143,7 @@ export default function Wizard() {
             onOpenRange={(levelIds) =>
               setSub({ kind: 'range', levelIds, title: 'Copy floor configuration' })
             }
-            onOpenFacilities={() => setSub({ kind: 'facilities' })}
+            onOpenFacilities={(openAdd) => setSub({ kind: 'facilities', openAdd })}
           />
         )}
         {!sub && step === 3 && <StepCharges />}
@@ -219,7 +219,7 @@ function CreatedScreen({ propertyId }: { propertyId: string }) {
           <Check size={34} aria-hidden />
         </span>
         <div className="h1">Property created</div>
-        <div style={{ marginTop: 10, fontSize: 15, fontWeight: 700, color: 'var(--teal-dark)' }}>
+        <div style={{ marginTop: 10, fontSize: 18, fontWeight: 700, color: 'var(--teal-dark)' }}>
           {property.details.name}
         </div>
         <div
@@ -239,14 +239,14 @@ function CreatedScreen({ propertyId }: { propertyId: string }) {
             { value: priced, label: 'priced' },
           ].map((item) => (
             <div key={item.label}>
-              <b style={{ fontSize: 18, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
+              <b style={{ fontSize: 21.6, fontWeight: 800, fontVariantNumeric: 'tabular-nums' }}>
                 {item.value}
               </b>
               <span
                 style={{
                   display: 'block',
                   marginTop: 6,
-                  fontSize: 11,
+                  fontSize: 13.2,
                   fontWeight: 600,
                   color: 'var(--ink-3)',
                 }}

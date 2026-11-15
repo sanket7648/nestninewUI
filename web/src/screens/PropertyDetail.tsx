@@ -92,7 +92,7 @@ export default function PropertyDetail({ propertyId }: { propertyId: string }) {
       )}
 
       <div className="page page-wide" style={{ paddingTop: 12 }}>
-        <div className="h3" style={{ fontSize: 21 }}>
+        <div className="h3" style={{ fontSize: 25.2 }}>
           {property.details.name}
         </div>
         <div className="row-sub" style={{ marginTop: 6 }}>
@@ -104,7 +104,7 @@ export default function PropertyDetail({ propertyId }: { propertyId: string }) {
             display: 'flex',
             gap: 6,
             alignItems: 'flex-start',
-            fontSize: 12.5,
+            fontSize: 15,
             fontWeight: 600,
             color: 'var(--ink-2)',
           }}
@@ -253,7 +253,7 @@ export default function PropertyDetail({ propertyId }: { propertyId: string }) {
                           {level.name}
                         </span>
                         <span className="row-sub" style={{ display: 'block' }}>
-                          {level.usage}
+                          {levelSummary(level)}
                         </span>
                       </span>
                       <span className="row-right">
@@ -353,11 +353,11 @@ function FloorSheet({
         </span>
         <span>
           <strong>{level.name}</strong>
-          <small>{level.usage}</small>
+          <small>{levelSummary(level)}</small>
         </span>
       </div>
       <p className="muted" style={{ margin: '0 0 10px' }}>
-        {level.usage} · {levelSummary(level)}
+        {levelSummary(level)}
       </p>
       {levelFacilities.length > 0 && (
         <div className="chips" style={{ marginBottom: 12 }}>
@@ -427,7 +427,7 @@ function SpaceSheet({
         <span className="row-badge" style={floorColorStyle(property.levels, level.id)}>
           {level.badge}
         </span>
-        <span className="muted">{level.name} · {level.usage}</span>
+        <span className="muted">{level.name} · {levelSummary(level)}</span>
       </div>
 
       <StatGrid

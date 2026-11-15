@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Facility, Level } from '../types';
-import { facilitiesForLevel, floorColorStyle } from './model';
+import { copiedSpaceName, facilitiesForLevel, floorColorStyle, levelSummary } from './model';
 
 const levels: Level[] = [
   {
@@ -45,6 +45,46 @@ describe('floorColorStyle', () => {
     expect(new Set(backgrounds).size).toBe(levels.length);
   });
 
+});
+
+describe('levelSummary', () => {
+  it('summarizes each space kind on the floor instead of inferring one kind for all', () => {
+    const level: Level = {
+      ...levels[1],
+      spaces: [
+        ...Array.from({ length: 5 }, (_, index) => ({
+          id: `shop-${index}`,
+          name: `Shop ${index + 1}`,
+          kind: 'Shop' as const,
+          features: [],
+          rent: null,
+        })),
+        ...Array.from({ length: 5 }, (_, index) => ({
+          id: `room-${index}`,
+          name: `Room ${index + 1}`,
+          kind: 'Room' as const,
+          features: [],
+          rent: null,
+        })),
+      ],
+    };
+
+    expect(levelSummary(level)).toBe('5 shops · 5 rooms');
+  });
+});
+
+describe('copiedSpaceName', () => {
+  it('renumbers copied spaces using the destination floor number', () => {
+    const room = {
+      id: 'room-1',
+      name: 'Room 101',
+      kind: 'Room' as const,
+      features: [],
+      rent: null,
+    };
+
+    expect(copiedSpaceName(room, { ...levels[2], floorNo: 2 }, 0)).toBe('Room 201');
+  });
 });
 
 describe('facilitiesForLevel', () => {
